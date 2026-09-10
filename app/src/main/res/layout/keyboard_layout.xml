@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#222222"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/keyboardInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="متن پیام..."
+            android:textColor="#FFFFFF"
+            android:textColorHint="#888888"
+            android:background="#333333"
+            android:padding="10dp"
+            android:inputType="textMultiLine"
+            android:maxLines="3"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/keyboardSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ارسال"
+            android:backgroundTint="#6200EE"
+            android:textColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/keyboardClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="✕"
+            android:backgroundTint="#444444"
+            android:textColor="#FFFFFF"
+            android:layout_marginStart="4dp" />
+
+    </LinearLayout>
+
+</LinearLayout>
