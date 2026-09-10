@@ -28,22 +28,39 @@ public class AutoClickService extends AccessibilityService {
     }
 
     /**
-     * زدن دکمه Send توی بازی Clash of Clans
+     * پیست + تأیید + ارسال، همه پشت سر هم
      */
-    public void tapSendButton() {
+    public void performAutoSend() {
         handler.post(() -> {
             android.util.DisplayMetrics metrics = getResources().getDisplayMetrics();
-            int screenWidth = metrics.widthPixels;
-            int screenHeight = metrics.heightPixels;
+            int w = metrics.widthPixels;
+            int h = metrics.heightPixels;
 
-            // موقعیت دکمه Send توی Clash of Clans
-            float x = screenWidth * 0.85f;
-            float y = screenHeight * 0.80f;
-
-            tapAt(x, y);
+            // ۱. فشار طولانی روی فیلد چت (برای باز شدن منوی Paste)
+            longPress(w * 0.38f, h * 0.92f, 600);
         });
     }
 
+    /**
+     * فشار طولانی
+     */
+    public void longPress(float x, float y, long duration) {
+        Path path = new Path();
+        path.moveTo(x, y);
+
+        GestureDescription.StrokeDescription stroke =
+                new GestureDescription.StrokeDescription(path, 0, duration);
+
+        GestureDescription gesture = new GestureDescription.Builder()
+                .addStroke(stroke)
+                .build();
+
+        dispatchGesture(gesture, null, null);
+    }
+
+    /**
+     * کلیک ساده
+     */
     public void tapAt(float x, float y) {
         Path path = new Path();
         path.moveTo(x, y);
@@ -56,6 +73,20 @@ public class AutoClickService extends AccessibilityService {
                 .build();
 
         dispatchGesture(gesture, null, null);
+    }
+
+    /**
+     * زدن دکمه Send بازی
+     */
+    public void tapSendButton() {
+        handler.post(() -> {
+            android.util.DisplayMetrics metrics = getResources().getDisplayMetrics();
+            int w = metrics.widthPixels;
+            int h = metrics.heightPixels;
+
+            // موقعیت دکمه Send توی Clash of Clans
+            tapAt(w * 0.85f, h * 0.92f);
+        });
     }
 
     @Override
