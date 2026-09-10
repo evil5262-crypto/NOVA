@@ -75,7 +75,8 @@ public class FloatingButtonService extends Service {
                 Toast.makeText(this, "اول سرویس دسترسی NOVA را فعال کن", Toast.LENGTH_SHORT).show();
                 return;
             }
-            service.tapSendButton();
+            // شروع حلقه خودکار (پیست + تأیید + ارسال)
+            service.startAutoSendLoop();
         });
 
         button.setOnTouchListener(new View.OnTouchListener() {
