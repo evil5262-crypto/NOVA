@@ -1,5 +1,8 @@
 package com.nova.autoclicker;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.PixelFormat;
@@ -12,8 +15,12 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
+import androidx.core.app.NotificationCompat;
 
 public class FloatingButtonService extends Service {
+
+    private static final String CHANNEL_ID = "nova_channel";
+    private static final int NOTIF_ID = 1;
 
     private WindowManager windowManager;
     private View floatingView;
@@ -25,6 +32,16 @@ public class FloatingButtonService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        createNotificationChannel();
+
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("NOVA")
+                .setContentText("NOVA فعال است")
+                .setSmallIcon(android.R.drawable.ic_menu_send)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .build();
+        startForeground(NOTIF_ID, notification);
 
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
@@ -55,10 +72,10 @@ public class FloatingButtonService extends Service {
         button.setOnClickListener(v -> {
             AutoClickService service = AutoClickService.getInstance();
             if (service == null) {
-                Toast.makeText(this, "اول NOVA را فعال کن", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "اول سرویس دسترسی NOVA را فعال کن", Toast.LENGTH_SHORT).show();
                 return;
             }
-            service.performSequence();
+            service.tapSendButton();
         });
 
         button.setOnTouchListener(new View.OnTouchListener() {
@@ -94,6 +111,18 @@ public class FloatingButtonService extends Service {
                 return false;
             }
         });
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "NOVA Service",
+                    NotificationManager.IMPORTANCE_LOW
+            );
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) manager.createNotificationChannel(channel);
+        }
     }
 
     @Override
