@@ -1,9 +1,6 @@
 package com.nova.autoclicker;
 
 import android.inputmethodservice.InputMethodService;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -13,7 +10,6 @@ import android.widget.Toast;
 public class NovaKeyboardService extends InputMethodService {
 
     private EditText inputField;
-    private final Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     public View onCreateInputView() {
@@ -30,49 +26,42 @@ public class NovaKeyboardService extends InputMethodService {
                 return;
             }
 
-            if (getCurrentInputConnection() != null) {
-                getCurrentInputConnection().commitText(text, 1);
+            // متن رو توی کلیپ‌بورد کپی کن
+            android.content.ClipboardManager clipboard =
+                    (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            android.content.ClipData clip =
+                    android.content.ClipData.newPlainText("nova", text);
+            if (clipboard != null) {
+                clipboard.setPrimaryClip(clip);
             }
 
-            handler.postDelayed(() -> {
-                sendKey(KeyEvent.KEYCODE_ENTER);
+            // حلقه رو شروع کن
+            AutoClickService service = AutoClickService.getInstance();
+            if (service != null) {
+                service.startAutoSendLoop();
+            }
 
-                handler.postDelayed(() -> {
-                    AutoClickService service = AutoClickService.getInstance();
-                    if (service != null) {
-                        service.tapSendButton();
-                    }
-                }, 500);
-            }, 200);
-
-            inputField.setText("");
+            Toast.makeText(this, "NOVA شروع کرد ⚡", Toast.LENGTH_SHORT).show();
         });
 
         btnClose.setOnClickListener(v -> {
+            AutoClickService service = AutoClickService.getInstance();
+            if (service != null) {
+                service.stopAutoSendLoop();
+            }
             hideWindow();
         });
 
         return view;
     }
 
-    private void sendKey(int keyCode) {
-        try {
-            if (getCurrentInputConnection() != null) {
-                getCurrentInputConnection().sendKeyEvent(
-                        new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
-                getCurrentInputConnection().sendKeyEvent(
-                        new KeyEvent(KeyEvent.ACTION_UP, keyCode));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void onStartInputView(EditorInfo info, boolean restarting) {
         super.onStartInputView(info, restarting);
         if (inputField != null) {
-            inputField.setText("");
+            String savedText = getSharedPreferences("nova_prefs", MODE_PRIVATE)
+                    .getString("message_text", "");
+            inputField.setText(savedText);
         }
     }
 }
