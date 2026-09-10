@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">NOVA</string>
+    <string name="accessibility_desc">NOVA - Auto click helper for games</string>
+</resources>
