@@ -12,7 +12,19 @@
         android:text="NOVA"
         android:textSize="32sp"
         android:textStyle="bold"
-        android:layout_marginBottom="40dp" />
+        android:layout_marginBottom="20dp" />
+
+    <EditText
+        android:id="@+id/etMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="متن پیام را وارد کنید..."
+        android:minLines="3"
+        android:gravity="top|start"
+        android:inputType="textMultiLine"
+        android:background="#EEEEEE"
+        android:padding="12dp"
+        android:layout_marginBottom="20dp" />
 
     <Button
         android:id="@+id/btnAccessibility"
