@@ -13,6 +13,10 @@ public class AutoClickService extends AccessibilityService {
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
+    private volatile boolean isLooping = false;
+
+    private static final long LOOP_DELAY = 30;
+
     public static AutoClickService getInstance() {
         return instance;
     }
@@ -27,23 +31,50 @@ public class AutoClickService extends AccessibilityService {
     public void onAccessibilityEvent(AccessibilityEvent event) {
     }
 
-    /**
-     * پیست + تأیید + ارسال، همه پشت سر هم
-     */
-    public void performAutoSend() {
-        handler.post(() -> {
-            android.util.DisplayMetrics metrics = getResources().getDisplayMetrics();
-            int w = metrics.widthPixels;
-            int h = metrics.heightPixels;
+    public void startAutoSendLoop() {
+        if (isLooping) {
+            stopAutoSendLoop();
+            return;
+        }
 
-            // ۱. فشار طولانی روی فیلد چت (برای باز شدن منوی Paste)
-            longPress(w * 0.38f, h * 0.92f, 600);
-        });
+        isLooping = true;
+        handler.post(loopRunnable);
     }
 
-    /**
-     * فشار طولانی
-     */
+    public void stopAutoSendLoop() {
+        isLooping = false;
+        handler.removeCallbacks(loopRunnable);
+    }
+
+    private final Runnable loopRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!isLooping) return;
+            performOneRound();
+            handler.postDelayed(this, LOOP_DELAY);
+        }
+    };
+
+    private void performOneRound() {
+        android.util.DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int w = metrics.widthPixels;
+        int h = metrics.heightPixels;
+
+        longPress(w * 0.38f, h * 0.92f, 400);
+
+        handler.postDelayed(() -> {
+            tapAt(w * 0.50f, h * 0.86f);
+        }, 500);
+
+        handler.postDelayed(() -> {
+            tapAt(w * 0.90f, h * 0.82f);
+        }, 800);
+
+        handler.postDelayed(() -> {
+            tapAt(w * 0.85f, h * 0.92f);
+        }, 1100);
+    }
+
     public void longPress(float x, float y, long duration) {
         Path path = new Path();
         path.moveTo(x, y);
@@ -58,9 +89,6 @@ public class AutoClickService extends AccessibilityService {
         dispatchGesture(gesture, null, null);
     }
 
-    /**
-     * کلیک ساده
-     */
     public void tapAt(float x, float y) {
         Path path = new Path();
         path.moveTo(x, y);
@@ -75,26 +103,13 @@ public class AutoClickService extends AccessibilityService {
         dispatchGesture(gesture, null, null);
     }
 
-    /**
-     * زدن دکمه Send بازی
-     */
-    public void tapSendButton() {
-        handler.post(() -> {
-            android.util.DisplayMetrics metrics = getResources().getDisplayMetrics();
-            int w = metrics.widthPixels;
-            int h = metrics.heightPixels;
-
-            // موقعیت دکمه Send توی Clash of Clans
-            tapAt(w * 0.85f, h * 0.92f);
-        });
-    }
-
     @Override
     public void onInterrupt() { }
 
     @Override
     public boolean onUnbind(android.content.Intent intent) {
         instance = null;
+        isLooping = false;
         return super.onUnbind(intent);
     }
 }
